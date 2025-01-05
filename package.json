@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon index.js",
-    "start":"node index.js"
+    "start": "node index.js"
   },
   "author": "Ritesh Poudel",
   "license": "ISC",
@@ -20,6 +20,7 @@
     "mongoose": "^8.9.3",
     "morgan": "^1.10.0",
     "nodemailer": "^6.9.16",
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.1.9",
+    "uuid": "^11.0.3"
   }
 }
