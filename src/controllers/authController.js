@@ -1,6 +1,9 @@
 import { responseClient } from "../middlewares/responseClient.js";
-import { createNewSession } from "../models/session/sessionModel.js";
-import { createNewUser } from "../models/user/userModel.js";
+import {
+  createNewSession,
+  deleteSession,
+} from "../models/session/sessionModel.js";
+import { createNewUser, updateUserStatus } from "../models/user/userModel.js";
 import { userActivationLink } from "../services/email/emailService.js";
 import { hashPassword } from "../utils/bcrypt.js";
 import { v4 as uuid } from "uuid";
@@ -10,7 +13,7 @@ export const insertNewUser = async (req, res, next) => {
     const { password } = req.body;
     const hashedPassword = hashPassword(password);
     req.body.password = hashedPassword;
-    
+
     const user = await createNewUser(req.body);
     if (!user?._id)
       throw new Error(
@@ -45,6 +48,42 @@ export const insertNewUser = async (req, res, next) => {
         "The provided email address is already in use. Please try another.";
     }
     error.statusCode = 400;
+    next(error);
+  }
+};
+
+export const activateUser = async (req, res, next) => {
+  try {
+    const { sessionId, t } = req.body;
+
+    const session = await deleteSession({
+      _id: sessionId,
+      token: t,
+    });
+    if (session?._id) {
+      // update user status
+      const user = await updateUserStatus(
+        { email: session?.association },
+        { isActivated: true }
+      );
+      if (user?._id) {
+        const url = `${process.env.FRONTEND_URL}/signin`;
+        const emailId = await userActivationLink({
+          email: user.email,
+          url,
+          name: user.firstName,
+        });
+        if (emailId) {
+          const message =
+            "User has been successfully activated. Please proceed to login.";
+          return responseClient({ req, res, message });
+        }
+      }
+    }
+    const msg= "Invalid link or token has expired."
+   
+    return responseClient({req, res, message:msg, statusCode:400});
+  } catch (error) {
     next(error);
   }
 };
