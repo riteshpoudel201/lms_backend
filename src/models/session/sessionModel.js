@@ -6,3 +6,7 @@ const Session = model("Session", SessionSchema);
 export const createNewSession = (data) => {
   return new Session(data).save();
 };
+
+export const deleteSession = (filter) =>{
+  return Session.findOneAndDelete(filter);
+}
