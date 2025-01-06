@@ -1,12 +1,16 @@
-import mongoose from "mongoose";
+import { model } from "mongoose";
 import { UserSchema } from "./userSchema.js";
 
-const User = mongoose.model("User", UserSchema);
+const User = model("User", UserSchema);
 
-export const getUser = () =>{
-    return User.find();
-}
+export const getUser = () => {
+  return User.find();
+};
 
-export const createNewUser = (data) =>{
-    return User(data).save();
-}
+export const createNewUser = (data) => {
+  return User(data).save();
+};
+
+export const updateUserStatus = (filter, update) => {
+  return User.findOneAndUpdate(filter, update, { new: true });
+};
