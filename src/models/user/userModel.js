@@ -14,3 +14,7 @@ export const createNewUser = (data) => {
 export const updateUserStatus = (filter, update) => {
   return User.findOneAndUpdate(filter, update, { new: true });
 };
+
+export const getUserByEmail =(email) => {
+  return User. findOne({email});
+}
