@@ -1,3 +1,4 @@
+import Joi from "joi";
 import { validateData } from "./joiValidation.js";
 
 export const validateUser = (req, res, next) => {
