@@ -17,3 +17,10 @@ export const validateUserActivationData = (req, res, next) => {
   };
   return validateData({ req, res, next, obj });
 };
+export const validateUserLoginData = (req, res, next) => {
+  const obj = {
+    email: Joi.string().email({ minDomainSegments: 2 }).required(),
+    password: Joi.string().required(),
+  };
+  return validateData({ req, res, next, obj });
+};
