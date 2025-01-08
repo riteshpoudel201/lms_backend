@@ -6,11 +6,12 @@ import {
 import {
   createNewUser,
   getUserByEmail,
-  updateUserStatus,
+  updateUser,
 } from "../models/user/userModel.js";
 import { userActivationLink } from "../services/email/emailService.js";
 import { comparePassword, hashPassword } from "../utils/bcrypt.js";
 import { v4 as uuid } from "uuid";
+import { getJwts } from "../utils/jwt.js";
 
 export const insertNewUser = async (req, res, next) => {
   try {
@@ -66,7 +67,7 @@ export const activateUser = async (req, res, next) => {
     });
     if (session?._id) {
       // update user status
-      const user = await updateUserStatus(
+      const user = await updateUser(
         { email: session?.association },
         { isActivated: true }
       );
@@ -103,14 +104,19 @@ export const loginUser = async (req, res, next) => {
     const isPasswordValid = comparePassword(password, user?.password);
     if (isPasswordValid) {
       //create jwt
-
+      const jwts = await getJwts(email);
       //response jwt
+      return responseClient({
+        req,
+        res,
+        message: "Logged in successfully.",
+        data: jwts,
+      });
     }
-
-    return responseClient({ req, res, message: msg, statusCode: 400 });
+    return responseClient({req,res, message:"Unable to login.", statusCode:400});
   } catch (error) {
-    if(error.message.includes("Invalid email")){
-      error.statusCode = 401
+    if (error.message.includes("Invalid email")) {
+      error.statusCode = 401;
     }
     next(error);
   }
