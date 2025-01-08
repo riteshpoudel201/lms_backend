@@ -3,9 +3,13 @@ import {
   createNewSession,
   deleteSession,
 } from "../models/session/sessionModel.js";
-import { createNewUser, updateUserStatus } from "../models/user/userModel.js";
+import {
+  createNewUser,
+  getUserByEmail,
+  updateUserStatus,
+} from "../models/user/userModel.js";
 import { userActivationLink } from "../services/email/emailService.js";
-import { hashPassword } from "../utils/bcrypt.js";
+import { comparePassword, hashPassword } from "../utils/bcrypt.js";
 import { v4 as uuid } from "uuid";
 
 export const insertNewUser = async (req, res, next) => {
@@ -80,10 +84,34 @@ export const activateUser = async (req, res, next) => {
         }
       }
     }
-    const msg= "Invalid link or token has expired."
-   
-    return responseClient({req, res, message:msg, statusCode:400});
+    const msg = "Invalid link or token has expired.";
+
+    return responseClient({ req, res, message: msg, statusCode: 400 });
   } catch (error) {
+    next(error);
+  }
+};
+export const loginUser = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    //get user by email
+    const user = await getUserByEmail(email);
+    //compare password
+    if (!user?.id) throw new Error("Invalid email or password.");
+
+    const isPasswordValid = comparePassword(password, user?.password);
+    if (isPasswordValid) {
+      //create jwt
+
+      //response jwt
+    }
+
+    return responseClient({ req, res, message: msg, statusCode: 400 });
+  } catch (error) {
+    if(error.message.includes("Invalid email")){
+      error.statusCode = 401
+    }
     next(error);
   }
 };
