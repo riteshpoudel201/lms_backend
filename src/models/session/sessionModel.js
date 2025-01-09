@@ -10,3 +10,6 @@ export const createNewSession = (data) => {
 export const deleteSession = (filter) =>{
   return Session.findOneAndDelete(filter);
 }
+export const getSession = (filter) =>{
+  return Session.findOne(filter);
+}
