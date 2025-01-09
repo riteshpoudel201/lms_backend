@@ -1,9 +1,15 @@
+//npm packages
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
+
 import { connectMongoose } from "./src/config/db.js";
-import {authRouter} from "./src/routes/index.js"
+
+//routers
+import {authRouter, userRouter} from "./src/routes/index.js"
+
+
 import { errorHanlder } from "./src/middlewares/errorHandler.js";
 import { responseClient } from "./src/middlewares/responseClient.js";
 
@@ -20,6 +26,7 @@ app.get("/", (req,res)=>{
 })
 
 app.use("/api/v1/auth", authRouter)
+app.use("/api/v1/user", userRouter)
 
 
 app.use(errorHanlder);
