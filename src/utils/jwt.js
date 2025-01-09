@@ -22,6 +22,22 @@ const createAccessJwt = async (email) => {
   }
   return null;
 };
+
+export const verifyAccessJwt = async (token)=>{
+  if(!token){
+    return "Token not provided."
+  }
+  console.log(token);
+  console.log(process.env.ACCESS_TOKEN_JWT_SECRET);
+  try {
+    const result= await Jwt.verify(token, process.env.ACCESS_TOKEN_JWT_SECRET);
+    console.log("Result: ", result);
+    return result;
+  } catch (error) {
+    console.log(error.message);
+  }
+  
+}
  const createRefreshJwt = async (email) => {
   const refreshJwt = Jwt.sign({email}, process.env.REFRESH_TOKEN_JWT_SECRET, {
     expiresIn: `${process.env.REFRESH_TOKEN_EXPIRY}`,
@@ -32,6 +48,16 @@ const createAccessJwt = async (email) => {
   }
   return null;
 };
+
+export const verifyRefreshJwt = async (token)=>{
+  try {
+    return Jwt.verify(token, process.env.REFRESH_TOKEN_JWT_SECRET)
+  } catch (error) {
+    console.log(error);
+    return error.message;
+  }
+  
+}
 
 export const getJwts =async (email) =>{
     return {
