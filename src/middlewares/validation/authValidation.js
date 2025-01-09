@@ -1,3 +1,4 @@
+import Joi from "joi";
 import { validateData } from "./joiValidation.js";
 
 export const validateUser = (req, res, next) => {
@@ -14,6 +15,13 @@ export const validateUserActivationData = (req, res, next) => {
   const obj = {
     sessionId: Joi.string().min(10).max(50).required(),
     t: Joi.string().min(10).max(50).required(),
+  };
+  return validateData({ req, res, next, obj });
+};
+export const validateUserLoginData = (req, res, next) => {
+  const obj = {
+    email: Joi.string().email({ minDomainSegments: 2 }).required(),
+    password: Joi.string().required(),
   };
   return validateData({ req, res, next, obj });
 };
