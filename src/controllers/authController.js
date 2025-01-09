@@ -102,7 +102,8 @@ export const loginUser = async (req, res, next) => {
     if (!user?.id) throw new Error("Invalid email or password.");
 
     const isPasswordValid = comparePassword(password, user?.password);
-    if (isPasswordValid) {
+    if(!isPasswordValid) throw new Error("Invalid email or password.")
+    
       //create jwt
       const jwts = await getJwts(email);
       //response jwt
@@ -112,8 +113,6 @@ export const loginUser = async (req, res, next) => {
         message: "Logged in successfully.",
         data: jwts,
       });
-    }
-    return responseClient({req,res, message:"Unable to login.", statusCode:400});
   } catch (error) {
     if (error.message.includes("Invalid email")) {
       error.statusCode = 401;
