@@ -18,3 +18,7 @@ export const updateUser = (filter, update) => {
 export const getUserByEmail =(email) => {
   return User. findOne({email});
 }
+
+export const getOneUser = (filter) => {
+  return User.findOne(filter)
+}
