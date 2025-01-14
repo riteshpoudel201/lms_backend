@@ -1,6 +1,7 @@
 import { responseClient } from "../middlewares/responseClient.js";
 import {
   createNewSession,
+  deleteManySession,
   deleteSession,
 } from "../models/session/sessionModel.js";
 import {
@@ -95,6 +96,7 @@ export const activateUser = async (req, res, next) => {
 export const loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+    console.log("Credentials: ", email);
 
     //get user by email
     const user = await getUserByEmail(email);
@@ -102,17 +104,17 @@ export const loginUser = async (req, res, next) => {
     if (!user?.id) throw new Error("Invalid email or password.");
 
     const isPasswordValid = comparePassword(password, user?.password);
-    if(!isPasswordValid) throw new Error("Invalid email or password.")
-    
-      //create jwt
-      const jwts = await getJwts(email);
-      //response jwt
-      return responseClient({
-        req,
-        res,
-        message: "Logged in successfully.",
-        data: jwts,
-      });
+    if (!isPasswordValid) throw new Error("Invalid email or password.");
+
+    //create jwt
+    const jwts = await getJwts(email);
+    //response jwt
+    return responseClient({
+      req,
+      res,
+      message: "Logged in successfully.",
+      data: jwts,
+    });
   } catch (error) {
     if (error.message.includes("Invalid email")) {
       error.statusCode = 401;
@@ -120,3 +122,55 @@ export const loginUser = async (req, res, next) => {
     next(error);
   }
 };
+export const logoutUser = async (req, res, next) => {
+  try {
+    // Get the user email
+    const { email } = req.userInfo;
+
+    // Update the refresh token
+    const user = await updateUser({ email }, { refreshJwt: "" });
+    if (!user) {
+      return responseClient({
+        req,
+        res,
+        message: "Unable to logout. User not found.",
+        statusCode: 404,
+      });
+    }
+
+    // Delete all associated sessions
+    const sessionResult = await deleteManySession({ association: user.email });
+
+    // Check if sessions were deleted successfully
+    if (sessionResult?.deletedCount > 0) {
+      return responseClient({
+        req,
+        res,
+        message: "User logged out successfully.",
+        statusCode: 200,
+      });
+    }
+
+    // If no sessions were deleted
+    return responseClient({
+      req,
+      res,
+      message: "No sessions found for this user.",
+      statusCode: 400,
+    });
+  } catch (error) {
+    // Handle specific error scenarios
+    if (error.message.includes("Invalid email")) {
+      return responseClient({
+        req,
+        res,
+        message: "Invalid email provided.",
+        statusCode: 401,
+      });
+    }
+
+    // Propagate other errors
+    next(error);
+  }
+};
+
