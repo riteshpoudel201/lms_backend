@@ -3,7 +3,7 @@ import { jwtExpiryToMilliseconds } from "./function.js";
 import { createNewSession } from "../models/session/sessionModel.js";
 import { updateUser } from "../models/user/userModel.js";
 
-const createAccessJwt = async (email) => {
+export const createAccessJwt = async (email) => {
   const token = Jwt.sign({email}, process.env.ACCESS_TOKEN_JWT_SECRET, {
     expiresIn: `${process.env.ACCESS_TOKEN_EXPIRY}`,
   });
@@ -50,10 +50,14 @@ export const verifyAccessJwt = async (token)=>{
 };
 
 export const verifyRefreshJwt = async (token)=>{
+  if(!token){
+    return "Token not provided."
+  }
   try {
-    return Jwt.verify(token, process.env.REFRESH_TOKEN_JWT_SECRET)
+    const result= await Jwt.verify(token, process.env.REFRESH_TOKEN_JWT_SECRET);
+    return result;
   } catch (error) {
-    console.log(error);
+    console.log(error.message);
     return error.message;
   }
   
