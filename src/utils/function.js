@@ -9,7 +9,6 @@ export function jwtExpiryToMilliseconds(expiry) {
       y: 365 * 24 * 60 * 60 * 1000 // Years 
     };
   
-    // Use regex to extract numeric value and time unit
     const match = expiry.match(/^(\d+)([smhdy])$/);
     if (!match) {
       throw new Error("Invalid expiry format. Use a format like '15d', '15m', etc.");
@@ -18,7 +17,6 @@ export function jwtExpiryToMilliseconds(expiry) {
     const [_, value, unit] = match;
     const numericValue = parseInt(value, 10);
   
-    // Validate unit and calculate milliseconds
     if (!timeUnits[unit]) {
       throw new Error(`Invalid time unit '${unit}'. Use one of: ${Object.keys(timeUnits).join(", ")}`);
     }
@@ -26,5 +24,12 @@ export function jwtExpiryToMilliseconds(expiry) {
     return numericValue * timeUnits[unit];
   }
   
+  export const generateOTP = (length=6) =>{
+    let random = [];
+    for(let i =0; i < length ; i++){
+      random.push( Math.floor(Math.random() * 10))
+    }
+    return random.join("");
+  }
   
   
