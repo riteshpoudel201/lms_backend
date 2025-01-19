@@ -25,3 +25,16 @@ export const validateUserLoginData = (req, res, next) => {
   };
   return validateData({ req, res, next, obj });
 };
+export const validateRequestOtpData = (req, res, next) => {
+  const obj = {
+    email: Joi.string().email({ minDomainSegments: 2 }).required(),
+  };
+  return validateData({ req, res, next, obj });
+};
+export const validateResetPasswordData = (req, res, next) => {
+  const obj = {
+    otp: Joi.number().required(),
+    password: Joi.string().required(),
+  };
+  return validateData({ req, res, next, obj });
+};
