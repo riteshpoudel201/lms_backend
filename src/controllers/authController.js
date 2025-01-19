@@ -9,10 +9,15 @@ import {
   getUserByEmail,
   updateUser,
 } from "../models/user/userModel.js";
-import { userActivationLink } from "../services/email/emailService.js";
+import {
+  otpNotificationEmail,
+  userActivationLink,
+} from "../services/email/emailService.js";
 import { comparePassword, hashPassword } from "../utils/bcrypt.js";
 import { v4 as uuid } from "uuid";
 import { getJwts } from "../utils/jwt.js";
+import { deleteManyOtp, saveOtp } from "../models/otp/otpModel.js";
+import { generateOTP } from "../utils/function.js";
 
 export const insertNewUser = async (req, res, next) => {
   try {
@@ -174,3 +179,115 @@ export const logoutUser = async (req, res, next) => {
   }
 };
 
+export const requestOTP = async (req, res, next) => {
+  try {
+    // Get the email from the request body
+    const { email } = req.body;
+
+    // Check if user exists
+    const user = await getUserByEmail(email);
+    if (!user) {
+      return responseClient({
+        req,
+        res,
+        message: "The email you entered does not exist in our system.",
+        statusCode: 404,
+      });
+    }
+
+    // Generate and save OTP to the database
+    const otpCode = generateOTP();
+    const payload = { otp: otpCode, association: email };
+
+    try {
+      const otp = await saveOtp(payload);
+
+      if (!otp || !otp._id) {
+        return responseClient({
+          req,
+          res,
+          message: "Failed to generate OTP. Please try again.",
+          statusCode: 500,
+        });
+      }
+
+      // Send the OTP email
+      const mail = await otpNotificationEmail({
+        email,
+        name: user.firstName,
+        otp: otp.otp,
+      });
+
+      if (!mail) {
+        return responseClient({
+          req,
+          res,
+          message:
+            "OTP generated but failed to send email. Please try again later.",
+          statusCode: 500,
+        });
+      }
+
+      // Success Response
+      return responseClient({
+        req,
+        res,
+        message:
+          "OTP generated and sent to your email. Please check your inbox.",
+        statusCode: 200,
+      });
+    } catch (error) {
+      return responseClient({
+        req,
+        res,
+        message: "Error occurred while saving OTP. Please try again later.",
+        statusCode: 500,
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const resetPassword = async (req, res, next) => {
+  try {
+    const { otp, password } = req.body;
+
+    // Validate OTP
+    const otpRecord = await getOtp({ otp });
+    if (!otpRecord || otpRecord.isExpired) {
+      return responseClient({
+        req,
+        res,
+        message: "OTP expired or invalid.",
+        statusCode: 400,
+      });
+    }
+
+    // Hash the new password
+    const hashedPassword = await hashPassword(password);
+
+    // Update the user's password
+    const user = await getUserByEmail(otpRecord.association);
+    if (!user) {
+      return responseClient({
+        req,
+        res,
+        message: "User not found.",
+        statusCode: 404,
+      });
+    }
+    await updateUser({ _id: user._id }, { password: hashedPassword });
+
+    // Invalidate the OTP
+    await deleteManyOtp({ _id: otpRecord._id });
+
+    return responseClient({
+      req,
+      res,
+      message: "Password reset successfully.",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
