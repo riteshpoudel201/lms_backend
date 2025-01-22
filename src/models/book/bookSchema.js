@@ -4,9 +4,7 @@ const BookSchema = new Schema(
   {
     status: {
       type: String,
-      required: true,
-      unique: true,
-      trim: true,
+      default:"inactive"
     },
     title: {
       type: String,
@@ -46,7 +44,7 @@ const BookSchema = new Schema(
         ref: "User",
       },
     },
-    updatedBy: {
+    lastUpdatedBy: {
       name: {
         type: String,
       },
