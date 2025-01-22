@@ -79,8 +79,7 @@ export const userAuthMiddleware = async (req, res, next) => {
   const user = await fetchActivatedUser(req, session?.association, res);
   if (!user) return;
 
-  // Remove sensitive data and assign user info to req
-  const { password, role, isActivated, createdAt, updatedAt, ...rest } =
+  const { password, isActivated, createdAt, updatedAt, ...rest } =
     (req.userInfo = user.toObject() ?? {});
 
   return next();
