@@ -16,7 +16,7 @@ import {
 import { comparePassword, hashPassword } from "../utils/bcrypt.js";
 import { v4 as uuid } from "uuid";
 import { getJwts } from "../utils/jwt.js";
-import { deleteManyOtp, saveOtp } from "../models/otp/otpModel.js";
+import { deleteManyOtp, getOtp, saveOtp } from "../models/otp/otpModel.js";
 import { generateOTP } from "../utils/function.js";
 
 export const insertNewUser = async (req, res, next) => {
