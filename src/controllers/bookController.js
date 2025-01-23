@@ -19,15 +19,7 @@ export const getAllBooks = async (req, res, next) => {
   }
 };
 export const getAllAvailableBooks = async (req, res, next) => {
-  // const user = req.userInfo;
-  // if (user?._id) {
-  //   return responseClient({
-  //     req,
-  //     res,
-  //     message: "User unauthorized.",
-  //     statusCode: 401,
-  //   });
-  // }
+  
   try {
     const books = await getAllBook();
     const availableBooks = books.filter((book) => book.available === true);
