@@ -45,7 +45,12 @@ const fetchActivatedUser = async (req, email, res) => {
     if (user?._id && user?.isActivated) {
       return user;
     }
-    sendErrorResponse(req, res, "User is either not activated or unavailable.", 400);
+    sendErrorResponse(
+      req,
+      res,
+      "User is either not activated or unavailable.",
+      400
+    );
     return null;
   } catch (error) {
     sendErrorResponse(req, res, "Error fetching user details.", 500);
@@ -85,8 +90,21 @@ export const userAuthMiddleware = async (req, res, next) => {
   return next();
 };
 
-
-
+export const adminAuthMiddleware = async = (req, res, next) => {
+  try {
+    req.userInfo.role === "admin"
+    ? next()
+    : responseClient({
+        req,
+        res,
+        message: "You don't have access to this resource.",
+        statusCode: 403,
+      });
+  } catch (error) {
+    next(error);
+  }
+  
+};
 
 export const renewJwtMiddleware = async (req, res, next) => {
   const { authorization } = req.headers;
@@ -120,4 +138,3 @@ export const renewJwtMiddleware = async (req, res, next) => {
     statusCode: 401,
   });
 };
-
