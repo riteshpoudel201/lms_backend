@@ -19,15 +19,15 @@ export const getAllBooks = async (req, res, next) => {
   }
 };
 export const getAllAvailableBooks = async (req, res, next) => {
-  const user = req.userInfo;
-  if (user?._id) {
-    return responseClient({
-      req,
-      res,
-      message: "User unauthorized.",
-      statusCode: 401,
-    });
-  }
+  // const user = req.userInfo;
+  // if (user?._id) {
+  //   return responseClient({
+  //     req,
+  //     res,
+  //     message: "User unauthorized.",
+  //     statusCode: 401,
+  //   });
+  // }
   try {
     const books = await getAllBook();
     const availableBooks = books.filter((book) => book.available === true);
@@ -43,14 +43,7 @@ export const getAllAvailableBooks = async (req, res, next) => {
 };
 export const insertNewBook = async (req, res, next) => {
   const user = req.userInfo;
-  if (user.role !== "admin") {
-    return responseClient({
-      req,
-      res,
-      message: "User unauthorized.",
-      statusCode: 401,
-    });
-  }
+  
   try {
     const newBook = req.body;
     const book = await createBook({
