@@ -90,7 +90,7 @@ export const userAuthMiddleware = async (req, res, next) => {
   return next();
 };
 
-export const adminAuthMiddleware = async = (req, res, next) => {
+export const adminAuthMiddleware = async (req, res, next) => {
   try {
     req.userInfo.role === "admin"
     ? next()
