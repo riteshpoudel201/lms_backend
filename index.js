@@ -7,7 +7,7 @@ import morgan from "morgan";
 import { connectMongoose } from "./src/config/db.js";
 
 //routers
-import {authRouter, userRouter} from "./src/routes/index.js"
+import {authRouter, bookRouter, userRouter} from "./src/routes/index.js"
 
 
 import { errorHanlder } from "./src/middlewares/errorHandler.js";
@@ -27,6 +27,7 @@ app.get("/", (req,res)=>{
 
 app.use("/api/v1/auth", authRouter)
 app.use("/api/v1/user", userRouter)
+app.use("/api/v1/books", bookRouter)
 
 
 app.use(errorHanlder);
