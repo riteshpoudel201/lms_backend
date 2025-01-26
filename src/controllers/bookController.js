@@ -1,5 +1,5 @@
 import { responseClient } from "../middlewares/responseClient.js";
-import { createBook, getAllBook } from "../models/book/bookModel.js";
+import { createBook, getAllBook, updateBook } from "../models/book/bookModel.js";
 
 export const getAllBooks = async (req, res, next) => {
   const { role } = req.userInfo;
@@ -56,6 +56,37 @@ export const insertNewBook = async (req, res, next) => {
       req,
       res,
       message: "Unable to create book.",
+      statusCode: 400,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateExistingBook = async (req, res, next) => {
+  const user = req.userInfo;
+  
+  try {
+    const existingBook = req.body;
+    const { id } = req.params;
+    const book = await updateBook({_id: id},{
+      ...existingBook,
+      lastUpdatedBy: {
+        name: user.firstName + " " + user.lastName,
+        adminId: user._id,
+      },
+    });
+    if (book?._id) {
+      return responseClient({
+        req,
+        res,
+        message: "Book updated successfully.",
+      });
+    }
+    return responseClient({
+      req,
+      res,
+      message: "Unable to update book.",
       statusCode: 400,
     });
   } catch (error) {
