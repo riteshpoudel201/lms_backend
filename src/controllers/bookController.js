@@ -1,5 +1,5 @@
 import { responseClient } from "../middlewares/responseClient.js";
-import { createBook, getAllBook, updateBook } from "../models/book/bookModel.js";
+import { createBook, deleteOneBook, getAllBook, updateBook } from "../models/book/bookModel.js";
 
 export const getAllBooks = async (req, res, next) => {
   const { role } = req.userInfo;
@@ -87,6 +87,29 @@ export const updateExistingBook = async (req, res, next) => {
       req,
       res,
       message: "Unable to update book.",
+      statusCode: 400,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+export const deleteExistingBook = async (req, res, next) => {
+  const user = req.userInfo;
+  
+  try {
+    const { id } = req.params;
+    const deletedBook = await deleteOneBook({_id: id});
+    if (deletedBook?.deletedCount > 0) {
+      return responseClient({
+        req,
+        res,
+        message: "Book deleted successfully.",
+      });
+    }
+    return responseClient({
+      req,
+      res,
+      message: "Unable to delete book.",
       statusCode: 400,
     });
   } catch (error) {
