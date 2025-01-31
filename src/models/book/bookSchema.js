@@ -22,9 +22,14 @@ const BookSchema = new Schema(
     },
     isbn: {
       type: Number,
+      unique: true,
       required: true,
     },
     genre: {
+      type: String,
+      required: true,
+    },
+    description:{
       type: String,
       required: true,
     },
