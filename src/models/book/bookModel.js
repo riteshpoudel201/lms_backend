@@ -10,6 +10,10 @@ import { BookSchema } from "./bookSchema.js";
     return  BookModel.find();
  }
 
+ export const getBooks = (filter) => {
+   return BookModel.find(filter);
+ }
+
  export const getOneBook =(filter) =>{
     return  BookModel.findOne(filter);
  }
