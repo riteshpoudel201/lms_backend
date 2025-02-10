@@ -1,5 +1,5 @@
 import { responseClient } from "../middlewares/responseClient.js";
-import { createBook, deleteOneBook, getAllBook, updateBook } from "../models/book/bookModel.js";
+import { createBook, deleteOneBook, getAllBook, getBooks, updateBook } from "../models/book/bookModel.js";
 
 export const getAllBooks = async (req, res, next) => {
   const { role } = req.userInfo;
@@ -13,7 +13,7 @@ export const getAllBooks = async (req, res, next) => {
   }
   try {
     const books = await getAllBook();
-    return responseClient({ req, res, message: "Books fetched successfully." });
+    return responseClient({ req, res, message: "Books fetched successfully.", data: books });
   } catch (error) {
     next(error);
   }
@@ -21,13 +21,13 @@ export const getAllBooks = async (req, res, next) => {
 export const getAllAvailableBooks = async (req, res, next) => {
   
   try {
-    const books = await getAllBook();
-    const availableBooks = books.filter((book) => book.available === true);
+    const books = await getBooks({available:true, status:"active"});
+    
     return responseClient({
       req,
       res,
       message: "Books fetched successfully.",
-      data: availableBooks,
+      data: books,
     });
   } catch (error) {
     next(error);
