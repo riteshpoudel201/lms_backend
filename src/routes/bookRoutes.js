@@ -17,8 +17,8 @@ import {
 
 const router = express.Router();
 
-router.get("/", userAuthMiddleware, getAllBooks);
-router.get("/available", getAllAvailableBooks);
+router.get("/admin", userAuthMiddleware, getAllBooks);
+router.get("/", getAllAvailableBooks);
 
 router.post(
   "/",
