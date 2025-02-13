@@ -11,6 +11,12 @@ const BookSchema = new Schema(
       required: true,
       trim: true,
     },
+    slug:{
+      type: String,
+      unique:true,
+      index:1,
+      required: true,
+    },
     year: {
       type: Number,
       required: true,
@@ -36,6 +42,10 @@ const BookSchema = new Schema(
     available: {
       type: Boolean,
       default: false,
+    },
+    expectedAvailabilityDate:{
+      type: Date,
+      default:null,
     },
     averageRating: {
       type: Number,
