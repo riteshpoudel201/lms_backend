@@ -1,5 +1,12 @@
 import { responseClient } from "../middlewares/responseClient.js";
-import { createBook, deleteOneBook, getAllBook, getBooks, updateBook } from "../models/book/bookModel.js";
+import {
+  createBook,
+  deleteOneBook,
+  getAllBook,
+  getBooks,
+  updateBook,
+} from "../models/book/bookModel.js";
+import slugify from "slugify";
 
 export const getAllBooks = async (req, res, next) => {
   const { role } = req.userInfo;
@@ -13,16 +20,6 @@ export const getAllBooks = async (req, res, next) => {
   }
   try {
     const books = await getAllBook();
-    return responseClient({ req, res, message: "Books fetched successfully.", data: books });
-  } catch (error) {
-    next(error);
-  }
-};
-export const getAllAvailableBooks = async (req, res, next) => {
-  
-  try {
-    const books = await getBooks({available:true, status:"active"});
-    
     return responseClient({
       req,
       res,
@@ -33,13 +30,39 @@ export const getAllAvailableBooks = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getAllAvailableBooks = async (req, res, next) => {
+  try {
+    const books = await getBooks({ available: true, status: "active" });
+
+    return responseClient({
+      req,
+      res,
+      message: "Books fetched successfully.",
+      data: books,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const insertNewBook = async (req, res, next) => {
   const user = req.userInfo;
-  
+
   try {
     const newBook = req.body;
+    const slugifiedTitle = slugify(newBook.title, {
+      replacement: "-",
+      remove: undefined,
+      lower: true,
+      strict: false,
+      locale: "vi",
+      trim: true,
+    });
+
     const book = await createBook({
       ...newBook,
+      slug: slugifiedTitle,
       addedBy: {
         name: user.firstName + " " + user.lastName,
         adminId: user._id,
@@ -65,17 +88,20 @@ export const insertNewBook = async (req, res, next) => {
 
 export const updateExistingBook = async (req, res, next) => {
   const user = req.userInfo;
-  
+
   try {
     const existingBook = req.body;
     const { id } = req.params;
-    const book = await updateBook({_id: id},{
-      ...existingBook,
-      lastUpdatedBy: {
-        name: user.firstName + " " + user.lastName,
-        adminId: user._id,
-      },
-    });
+    const book = await updateBook(
+      { _id: id },
+      {
+        ...existingBook,
+        lastUpdatedBy: {
+          name: user.firstName + " " + user.lastName,
+          adminId: user._id,
+        },
+      }
+    );
     if (book?._id) {
       return responseClient({
         req,
@@ -95,10 +121,10 @@ export const updateExistingBook = async (req, res, next) => {
 };
 export const deleteExistingBook = async (req, res, next) => {
   const user = req.userInfo;
-  
+
   try {
     const { id } = req.params;
-    const deletedBook = await deleteOneBook({_id: id});
+    const deletedBook = await deleteOneBook({ _id: id });
     if (deletedBook?.deletedCount > 0) {
       return responseClient({
         req,
