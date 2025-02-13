@@ -10,7 +10,7 @@ import { connectMongoose } from "./src/config/db.js";
 import {authRouter, bookRouter, userRouter} from "./src/routes/index.js"
 
 
-import { errorHanlder } from "./src/middlewares/errorHandler.js";
+import { errorHandler } from "./src/middlewares/errorHandler.js";
 import { responseClient } from "./src/middlewares/responseClient.js";
 
 const app = express();
@@ -30,7 +30,7 @@ app.use("/api/v1/user", userRouter)
 app.use("/api/v1/books", bookRouter)
 
 
-app.use(errorHanlder);
+app.use(errorHandler);
 const startServer = async () =>{
     try{
         const con = await connectMongoose();
