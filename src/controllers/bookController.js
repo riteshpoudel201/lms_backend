@@ -102,7 +102,7 @@ export const updateExistingBook = async (req, res, next) => {
         },
       }
     );
-    if (book?._id) {
+    if (book?.acknowledged) {
       return responseClient({
         req,
         res,
