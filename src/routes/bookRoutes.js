@@ -9,6 +9,7 @@ import {
 import {
   validateBook,
   validateBookID,
+  validateUpdateBook,
 } from "../middlewares/validation/bookValidation.js";
 import {
   adminAuthMiddleware,
@@ -33,7 +34,7 @@ router.put(
   userAuthMiddleware,
   adminAuthMiddleware,
   validateBookID,
-  validateBook,
+  validateUpdateBook,
   updateExistingBook
 );
 
