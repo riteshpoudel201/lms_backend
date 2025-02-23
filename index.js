@@ -3,6 +3,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
+import path from "path";
 
 import { connectMongoose } from "./src/config/db.js";
 
@@ -22,6 +23,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cors());
 app.use(morgan("dev"));
+app.use(express.static(path.join(__dirname, "uploads")));
 app.get("/", (req,res)=>{
     responseClient({ req, res, message:" Server is live."})
 })
