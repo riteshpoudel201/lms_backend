@@ -23,7 +23,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cors());
 app.use(morgan("dev"));
-app.use(express.static(path.join(__dirname, "uploads")));
+app.use(express.static(path.join(path.resolve(), "public")));
 app.get("/", (req,res)=>{
     responseClient({ req, res, message:" Server is live."})
 })
