@@ -1,5 +1,5 @@
 import express from "express";
-import multer from "multer";
+
 import {
   deleteExistingBook,
   getAllAvailableBooks,
@@ -16,9 +16,9 @@ import {
   adminAuthMiddleware,
   userAuthMiddleware,
 } from "../middlewares/authMiddleware.js";
+import { upload } from "../utils/upload.js";
 
 const router = express.Router();
-const upload = multer({dest:"/uploads"})
 
 router.get("/admin", userAuthMiddleware, getAllBooks);
 router.get("/", getAllAvailableBooks);
