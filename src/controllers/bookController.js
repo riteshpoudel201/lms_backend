@@ -48,6 +48,7 @@ export const getAllAvailableBooks = async (req, res, next) => {
 
 export const insertNewBook = async (req, res, next) => {
   const user = req.userInfo;
+  const { filename } = req.file;
 
   try {
     const newBook = req.body;
@@ -62,6 +63,7 @@ export const insertNewBook = async (req, res, next) => {
 
     const book = await createBook({
       ...newBook,
+      imageURL: `images/${filename}`,
       slug: slugifiedTitle,
       addedBy: {
         name: user.firstName + " " + user.lastName,
