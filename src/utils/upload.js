@@ -4,7 +4,7 @@ import fs from "fs";
 
 const __dirname = path.resolve();
 
-const imageStorageFolder = path.join(__dirname, "public/images");
+const imageStorageFolder = "public/images";
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     !fs.existsSync(imageStorageFolder) &&
