@@ -1,8 +1,13 @@
+import { deleteUploadedFiles } from "../utils/fileUtils.js";
 import { responseClient } from "./responseClient.js";
 
 export const errorHandler = (error, req, res, next) => {
   let statusCode = error.statusCode || 500;
   let message = error.message || "An unexpected error occurred.";
+
+  if(req.file || Array.isArray(req.files)){
+    deleteUploadedFiles(req);
+  }
 
   if (error.code === 11000) {
     const field = Object.keys(error.keyValue)[0];
