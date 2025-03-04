@@ -115,7 +115,7 @@ export const renewJwtMiddleware = async (req, res, next) => {
   if (!decoded.email) throw new Error("Unauthorized access.");
 
   const user = await getOneUser({ email: decoded.email, refreshJwt: token });
-  if (!user._id) throw new Error("User is unavailable.");
+  if (!user?._id) throw new Error("User is unavailable.");
 
   //create new accessJwt
   const accessJwt = await createAccessJwt(user?.email);
