@@ -36,6 +36,7 @@ router.put(
   "/:id",
   userAuthMiddleware,
   adminAuthMiddleware,
+  upload.array("bookImage"),
   validateBookID,
   validateUpdateBook,
   updateExistingBook
