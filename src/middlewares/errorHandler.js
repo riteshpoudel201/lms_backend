@@ -25,7 +25,15 @@ export const errorHandler = (error, req, res, next) => {
   } else if (error.name === "DocumentNotFoundError") {
     message = "The requested document was not found. Please check the ID and try again.";
     statusCode = 404;
+  } else if (error.name === "MulterError"){
+    if(error.message === "Unexpected field"){
+      message = "Unable to upload image. Please check the name and try again."
+      statusCode = 400;
+    }else{
+      message = "Unable to upload the image."
+      statusCode = 500;
+    }
   }
-
+   console.log("Unknown error.", error.name);
   responseClient({ req, res, statusCode, message });
 };
