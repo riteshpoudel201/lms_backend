@@ -8,7 +8,7 @@ export const validateData = ({ req, res, next, obj, source }) => {
   //validating the incoming data using the schema
   const value = schema.validate(req[source] || req.body);
   if (value.error) {
-    console.log("Just outside the check.");
+    console.log("Just outside the check.", value.error);
     if(req.file || Array.isArray(req.files)){
       deleteUploadedFiles(req);
     }
