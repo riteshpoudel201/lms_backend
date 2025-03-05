@@ -24,14 +24,18 @@ export const validateBook = (req, res, next) => {
 };
 
 export const validateUpdateBook = (req, res, next) => {
+   req.body.expectedAvailabilityDate = req.body.expectedAvailabilityDate === "null" ? null : req.body.expectedAvailabilityDate;
   const obj = {
     title: Joi.string().min(3).required(),
     year: Joi.number().min(9).required(),
     genre: Joi.string().required(),
+    imageURL: Joi.string().allow(""),
+    imageList:Joi.array().allow(""),
     author: Joi.string().required(),
     description: Joi.string().required(),
     expectedAvailabilityDate: Joi.date().allow(null, ""),
     status: Joi.string().valid("active","inactive").required(),
+    bookImage:Joi.array(),
   };
   return validateData({ req, res, next, obj });
 };
