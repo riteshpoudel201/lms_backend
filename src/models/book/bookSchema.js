@@ -26,6 +26,9 @@ const BookSchema = new Schema(
       type: String,
       required: true,
     },
+    imageList: [
+      {type: String, default: []}
+    ],
     isbn: {
       type: Number,
       unique: true,
