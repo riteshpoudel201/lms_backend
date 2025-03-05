@@ -90,7 +90,12 @@ export const insertNewBook = async (req, res, next) => {
 
 export const updateExistingBook = async (req, res, next) => {
   const user = req.userInfo;
-
+  const files = req.files;
+  let imageList = [];
+  if(files){
+    files.map(file=> imageList.push("images/" + file.filename));
+  }
+  console.log(imageList);
   try {
     const existingBook = req.body;
     const { id } = req.params;
@@ -98,6 +103,7 @@ export const updateExistingBook = async (req, res, next) => {
       { _id: id },
       {
         ...existingBook,
+        imageList:[...existingBook?.imageList, ...imageList],
         lastUpdatedBy: {
           name: user.firstName + " " + user.lastName,
           adminId: user._id,
