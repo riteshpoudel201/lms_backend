@@ -4,6 +4,7 @@ import {
   deleteOneBook,
   getAllBook,
   getBooks,
+  getOneBook,
   updateBook,
 } from "../models/book/bookModel.js";
 import slugify from "slugify";
@@ -91,25 +92,47 @@ export const insertNewBook = async (req, res, next) => {
 export const updateExistingBook = async (req, res, next) => {
   const user = req.userInfo;
   const files = req.files;
-  let imageList = [];
-  if(files){
-    files.map(file=> imageList.push("images/" + file.filename));
+  let newImageList = [];
+
+  if (files) {
+    newImageList = files.map((file) => "images/" + file.filename);
   }
-  console.log(imageList);
+
   try {
-    const existingBook = req.body;
     const { id } = req.params;
+    const existingBook = await getOneBook({_id:id}); // Fetch existing book from DB
+
+    if (!existingBook) {
+      return responseClient({
+        req,
+        res,
+        message: "Book not found.",
+        statusCode: 404,
+      });
+    }
+
+    const existingImages = existingBook.imageList || [];
+    const suppliedImages = req.body.imageList || [];
+
+    // Keep only common images + newly uploaded images
+    const updatedImageList = [
+      ...suppliedImages.filter((img) => existingImages.includes(img)), // Keep common images
+      ...newImageList, // Add new ones
+    ];
+
+    // Update book with the filtered image list
     const book = await updateBook(
       { _id: id },
       {
-        ...existingBook,
-        imageList:[...existingBook?.imageList, ...imageList],
+        ...req.body,
+        imageList: updatedImageList,
         lastUpdatedBy: {
-          name: user.firstName + " " + user.lastName,
+          name: `${user.firstName} ${user.lastName}`,
           adminId: user._id,
         },
       }
     );
+
     if (book?.acknowledged) {
       return responseClient({
         req,
@@ -117,6 +140,7 @@ export const updateExistingBook = async (req, res, next) => {
         message: "Book updated successfully.",
       });
     }
+
     return responseClient({
       req,
       res,
@@ -127,6 +151,7 @@ export const updateExistingBook = async (req, res, next) => {
     next(error);
   }
 };
+
 export const deleteExistingBook = async (req, res, next) => {
   const user = req.userInfo;
 
