@@ -1,15 +1,15 @@
 import { unlink } from "fs";
-import {resolve } from "path";
+import { resolve } from "path";
 
-const deleteFile = (path) =>{
-    try{ console.log("File unlinked.");
-        unlink(resolve(path),()=>{})
-
-    } catch(error){
-        console.log("Error from fileUtil.js ", error);
-    }
+export const deleteFile = async (path) => {
+  try {
+    const fullPath = resolve("public",path);
+    await unlink(fullPath,(err)=> console.log("Error: ", err));
+    console.log(`File deleted successfully: ${fullPath}`);
+  } catch (error) {
+    console.error(`Error deleting file at ${path}:`, error);
+  }
 }
-
 export const deleteUploadedFiles = (req) => {
   if (req.file) {
     deleteFile(req.file.path);
