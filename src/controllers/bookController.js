@@ -8,6 +8,7 @@ import {
   updateBook,
 } from "../models/book/bookModel.js";
 import slugify from "slugify";
+import { deleteFile } from "../utils/fileUtils.js";
 
 export const getAllBooks = async (req, res, next) => {
   const { role } = req.userInfo;
@@ -65,6 +66,7 @@ export const insertNewBook = async (req, res, next) => {
     const book = await createBook({
       ...newBook,
       imageURL: `images/${filename}`,
+      imageList:[`images/${filename}`],
       slug: slugifiedTitle,
       addedBy: {
         name: user.firstName + " " + user.lastName,
@@ -113,6 +115,14 @@ export const updateExistingBook = async (req, res, next) => {
 
     const existingImages = existingBook.imageList || [];
     const suppliedImages = req.body.imageList || [];
+    const imagesToBeDeleted = existingImages.filter(img => !suppliedImages.includes(img));
+    
+    if (imagesToBeDeleted.length > 0) {
+      Promise.all(imagesToBeDeleted.map(image => deleteFile(image)))
+        .then(() => console.log("All images deleted successfully"))
+        .catch(err => console.error("Error deleting some images:", err));
+    }
+    
 
     // Keep only common images + newly uploaded images
     const updatedImageList = [
@@ -157,6 +167,21 @@ export const deleteExistingBook = async (req, res, next) => {
 
   try {
     const { id } = req.params;
+
+    //get the book details
+    const existingBook = await getOneBook({_id:id});
+
+    //if there is image url , then delete
+    if(existingBook.imageURL){
+      deleteFile(existingBook.imageURL)
+    }
+
+    //if there are multiple images path, delete each individual images.
+    if(existingBook?.imageList){
+      existingBook.imageList.map(image=> deleteFile(image));
+    }
+
+    //finally delete the book data
     const deletedBook = await deleteOneBook({ _id: id });
     if (deletedBook?.deletedCount > 0) {
       return responseClient({
