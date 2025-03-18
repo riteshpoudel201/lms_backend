@@ -5,6 +5,13 @@ import { BookSchema } from "./bookSchema.js";
  export const createBook =(book) =>{
     return  new BookModel(book).save();
  }
+ export const createManyBook = (books) => {
+   return BookModel.insertMany(books);
+};
+
+export const emptyBook = () => {
+   return BookModel.deleteMany({});
+};
 
  export const getAllBook =() =>{
     return  BookModel.find();
