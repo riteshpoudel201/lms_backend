@@ -93,48 +93,56 @@ export const userAuthMiddleware = async (req, res, next) => {
 export const adminAuthMiddleware = async (req, res, next) => {
   try {
     req.userInfo.role === "admin"
-    ? next()
-    : responseClient({
-        req,
-        res,
-        message: "You don't have access to this resource.",
-        statusCode: 403,
-      });
+      ? next()
+      : responseClient({
+          req,
+          res,
+          message: "You don't have access to this resource.",
+          statusCode: 403,
+        });
   } catch (error) {
     next(error);
   }
-  
 };
 
 export const renewJwtMiddleware = async (req, res, next) => {
   const { authorization } = req.headers;
-  if (!authorization) throw new Error("Unauthorized access.");
-  const token = authorization.split(" ")[1];
 
-  const decoded = await verifyRefreshJwt(token);
-  if (!decoded.email) throw new Error("Unauthorized access.");
+  try {
+    if (!authorization) throw new Error("Unauthorized access.");
+    const token = authorization.split(" ")[1];
 
-  const user = await getOneUser({ email: decoded.email, refreshJwt: token });
-  if (!user?._id) throw new Error("User is unavailable.");
+    const decoded = await verifyRefreshJwt(token);
+    if (!decoded.email) throw new Error("Unauthorized access.");
 
-  //create new accessJwt
-  const accessJwt = await createAccessJwt(user?.email);
-  if (accessJwt) {
+    const user = await getOneUser({ email: decoded.email, refreshJwt: token });
+    if (!user?._id) throw new Error("User is unavailable.");
+
+    //create new accessJwt
+    const accessJwt = await createAccessJwt(user?.email);
+    if (accessJwt) {
+      return responseClient({
+        req,
+        res,
+        message: "Access token generated.",
+        statusCode: 200,
+        data: accessJwt,
+      });
+    }
+    //return accessJwt
+
+    //if all check have passed, just return the message saying user isn't activated
     return responseClient({
       req,
       res,
-      message: "Access token generated.",
-      statusCode: 200,
-      data: accessJwt,
+      message: "Unauthorized",
+      statusCode: 401,
+    });
+  } catch (error) {
+    return responseClient({
+      req,
+      res,
+      message: error.message || error,
     });
   }
-  //return accessJwt
-
-  //if all check have passed, just return the message saying user isn't activated
-  return responseClient({
-    req,
-    res,
-    message: "Unauthorized",
-    statusCode: 401,
-  });
 };
