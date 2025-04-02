@@ -4,6 +4,7 @@ import {
   deleteExistingBook,
   getAllAvailableBooks,
   getAllBooks,
+  getSingleBook,
   insertNewBook,
   updateExistingBook,
 } from "../controllers/bookController.js";
@@ -22,6 +23,7 @@ const router = express.Router();
 
 router.get("/admin", userAuthMiddleware, getAllBooks);
 router.get("/", getAllAvailableBooks);
+router.get("/:slug", getSingleBook)
 
 router.post(
   "/",

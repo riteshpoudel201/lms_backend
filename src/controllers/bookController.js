@@ -33,6 +33,22 @@ export const getAllBooks = async (req, res, next) => {
   }
 };
 
+export const getSingleBook = async (req, res, next) => {
+  const { slug } = req.params;
+  
+  try {
+    const books = await getBooks({slug, status:'active'});
+    return responseClient({
+      req,
+      res,
+      message: "Books with slug: '"+ slug +"' fetched successfully.",
+      data: books[0] || [],
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getAllAvailableBooks = async (req, res, next) => {
   try {
     const books = await getBooks({ available: true, status: "active" });
