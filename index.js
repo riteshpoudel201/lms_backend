@@ -8,7 +8,7 @@ import path from "path";
 import { connectMongoose } from "./src/config/db.js";
 
 //routers
-import {authRouter, bookRouter, userRouter} from "./src/routes/index.js"
+import {authRouter, bookRouter, userRouter, borrowRouter} from "./src/routes/index.js"
 
 
 import { errorHandler } from "./src/middlewares/errorHandler.js";
@@ -31,6 +31,7 @@ app.get("/", (req,res)=>{
 app.use("/api/v1/auth", authRouter)
 app.use("/api/v1/user", userRouter)
 app.use("/api/v1/books", bookRouter)
+app.use("/api/v1/borrow", borrowRouter)
 
 
 app.use(errorHandler);
