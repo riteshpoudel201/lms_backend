@@ -14,15 +14,15 @@ export const emptyBorrowBook = () => {
 };
 
  export const getAllBorrowedBook =() =>{
-    return  BookModel.find().populate("cart.book");
+    return  BookModel.find().populate("book");
  }
 
  export const getBorrowedBooks = (filter) => {
-   return BookModel.find(filter).populate("cart.book");
+   return BookModel.find(filter).populate("book");
  }
 
  export const getOneBorrowedBook =(filter) =>{
-    return  BookModel.findOne(filter).populate("cart.book");
+    return  BookModel.findOne(filter).populate("book");
  }
 
  export const updateBorrowedBook =(filter, updates) =>{

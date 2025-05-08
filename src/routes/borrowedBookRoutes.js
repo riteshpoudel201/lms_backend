@@ -5,7 +5,7 @@ import {
   userAuthMiddleware,
 } from "../middlewares/authMiddleware.js";
 import { borrowNewBook, getAllBorrowedBooks, getUserBorrowedBooks } from "../controllers/borrowBookController.js";
-import { validateBorrowedBook } from "../middlewares/validation/borrowBookValidation.js";
+import { validateBorrowedBook, validateManyBorrowedBook } from "../middlewares/validation/borrowBookValidation.js";
 
 const router = express.Router();
 
@@ -17,6 +17,13 @@ router.post(
   userAuthMiddleware,
   adminAuthMiddleware,
   validateBorrowedBook,
+  borrowNewBook
+);
+router.post(
+  "/many",
+  userAuthMiddleware,
+  adminAuthMiddleware,
+  validateManyBorrowedBook,
   borrowNewBook
 );
 

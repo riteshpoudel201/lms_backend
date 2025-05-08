@@ -7,22 +7,17 @@ const BorrowBookSchema = new Schema(
       ref: "User",
       required: true,
     },
-    
-    cart: [
-      {
-        book: {
-          type: Schema.Types.ObjectId,
-          ref: "Book",
-          required: true,
-        },
-        reviewId: {
-          type: Schema.Types.ObjectId,
-          ref: "Review",
-          default: null,
-        },
-      },
-    ],
-    
+    book: {
+      type: Schema.Types.ObjectId,
+      ref: "Book",
+      required: true,
+    },
+    reviewId: {
+      type: Schema.Types.ObjectId,
+      ref: "Review",
+      default: null,
+    },
+
     dueDate: {
       type: Date,
       required: true,
@@ -32,7 +27,6 @@ const BorrowBookSchema = new Schema(
       type: Date,
       default: null,
     },
-    
   },
   {
     timestamps: true,

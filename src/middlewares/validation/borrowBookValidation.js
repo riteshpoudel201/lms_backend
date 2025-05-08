@@ -10,17 +10,20 @@ export const validateBorrowedBookID = (req, res, next) => {
 
 export const validateBorrowedBook = (req, res, next) => {
   const obj = {
-    cart: Joi.array()
-      .items(
-        Joi.object({
-          book: Joi.string().required(),
-          reviewId: Joi.string().optional(),
-        })
-      )
-      .required(),
+    book: Joi.string().required(),
+    reviewId: Joi.string().optional(),
     returnedDate: Joi.date().optional(),
   };
   return validateData({ req, res, next, obj });
+};
+export const validateManyBorrowedBook = (req, res, next) => {
+  const obj = {
+    book: Joi.string().required(),
+    reviewId: Joi.string().optional(),
+    returnedDate: Joi.date().optional(),
+  };
+  const arrayObj = Joi.array().items(obj);
+  return validateData({ req, res, next, arrayObj });
 };
 
 // export const validateUpdateBook = (req, res, next) => {

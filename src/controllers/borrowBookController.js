@@ -1,5 +1,7 @@
+import { responseClient } from "../middlewares/responseClient.js";
 import {
   borrowBook,
+  borrowManyBook,
   getAllBorrowedBook,
   getBorrowedBooks,
 } from "../models/borrow/borrowBookModel.js";
@@ -59,7 +61,7 @@ export const borrowNewBook = async (req, res, next) => {
     const newBook = req.body;
     const dueDate = new Date().setDate(new Date().getDate() + BOOK_DUE_DATE);
     const book = await borrowBook({
-      cart: newBook,
+      ...newBook,
       userId: user._id,
       dueDate,
     });
@@ -68,6 +70,43 @@ export const borrowNewBook = async (req, res, next) => {
         req,
         res,
         message: "Book borrowed successfully.",
+      });
+    }
+    return responseClient({
+      req,
+      res,
+      message: "Unable to borrow book.",
+      statusCode: 400,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+export const borrowMultipleNewBook = async (req, res, next) => {
+  const user = req.userInfo;
+
+  if (!Array.isArray(req.body)) {
+    return responseClient({
+        req,
+        res,
+        message: "Expected an array of books.",
+        statusCode: 400
+      });
+  }
+  try {
+    const newBook = req.body.map((book) => ({
+      ...book,
+      userId: user._id,
+      dueDate,
+    }));
+    const dueDate = new Date().setDate(new Date().getDate() + BOOK_DUE_DATE);
+    const book = await borrowManyBook(newBook);
+    if (book.length > 0) {
+      return responseClient({
+        req,
+        res,
+        message: "Books are borrowed successfully.",
+        data: book,
       });
     }
     return responseClient({
