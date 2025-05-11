@@ -84,23 +84,29 @@ export const borrowNewBook = async (req, res, next) => {
 };
 export const borrowMultipleNewBook = async (req, res, next) => {
   const user = req.userInfo;
-
+  console.log("Reqest Body: ", req.body);
   if (!Array.isArray(req.body)) {
     return responseClient({
-        req,
-        res,
-        message: "Expected an array of books.",
-        statusCode: 400
-      });
+      req,
+      res,
+      message: "Expected an array of books.",
+      statusCode: 400,
+    });
   }
   try {
-    const newBook = req.body.map((book) => ({
-      ...book,
+    const dueDate = new Date().setDate(new Date().getDate() + BOOK_DUE_DATE);
+
+    const newBook = req.body.map((item) => ({
+      book: item.book,
+      reviewId: item.reviewId,
+      returnedDate: item.returnedDate,
       userId: user._id,
       dueDate,
     }));
-    const dueDate = new Date().setDate(new Date().getDate() + BOOK_DUE_DATE);
+    console.log("Newly borrowed book details: ", newBook);
+
     const book = await borrowManyBook(newBook);
+
     if (book.length > 0) {
       return responseClient({
         req,
