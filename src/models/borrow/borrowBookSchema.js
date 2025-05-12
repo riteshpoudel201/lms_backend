@@ -9,7 +9,7 @@ const BorrowBookSchema = new Schema(
     },
     book: {
       type: Schema.Types.ObjectId,
-      ref: "Book",
+      ref: "Books",
       required: true,
     },
     reviewId: {
