@@ -108,11 +108,15 @@ export const borrowMultipleNewBook = async (req, res, next) => {
     const book = await borrowManyBook(newBook);
 
     if (book.length > 0) {
+      const ids = book.map(doc=> doc._id)
+      const listedBooks = await getBorrowedBooks({_id : { $in: ids }})
+      console.log("Populated book: ", listedBooks)
+      console.log("Inserted book: ", ids)
       return responseClient({
         req,
         res,
         message: "Books are borrowed successfully.",
-        data: book,
+        data: listedBooks,
       });
     }
     return responseClient({
