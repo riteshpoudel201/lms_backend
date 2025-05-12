@@ -20,14 +20,12 @@ router.get("/", userAuthMiddleware, getUserBorrowedBooks);
 router.post(
   "/",
   userAuthMiddleware,
-  adminAuthMiddleware,
   validateBorrowedBook,
   borrowNewBook
 );
 router.post(
   "/many",
   userAuthMiddleware,
-  adminAuthMiddleware,
   validateBorrowedBook,
   borrowMultipleNewBook
 );
