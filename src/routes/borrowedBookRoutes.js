@@ -14,7 +14,7 @@ import { validateBorrowedBook } from "../middlewares/validation/borrowBookValida
 
 const router = express.Router();
 
-router.get("/admin", userAuthMiddleware, getAllBorrowedBooks);
+router.get("/admin", userAuthMiddleware,adminAuthMiddleware, getAllBorrowedBooks);
 router.get("/", userAuthMiddleware, getUserBorrowedBooks);
 
 router.post(
