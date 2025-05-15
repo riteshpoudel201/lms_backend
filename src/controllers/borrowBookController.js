@@ -1,4 +1,5 @@
 import { responseClient } from "../middlewares/responseClient.js";
+import { updateBook } from "../models/book/bookModel.js";
 import {
   borrowBook,
   borrowManyBook,
@@ -83,8 +84,8 @@ export const borrowNewBook = async (req, res, next) => {
   }
 };
 export const borrowMultipleNewBook = async (req, res, next) => {
+  console.log("Inside multiple insertion.");
   const user = req.userInfo;
-  console.log("Reqest Body: ", req.body);
   if (!Array.isArray(req.body)) {
     return responseClient({
       req,
@@ -103,15 +104,21 @@ export const borrowMultipleNewBook = async (req, res, next) => {
       userId: user._id,
       dueDate,
     }));
-    console.log("Newly borrowed book details: ", newBook);
+    console.log("Borrowed Book Payload: ", newBook);
+    const borrowedBooks = await borrowManyBook(newBook);
 
-    const book = await borrowManyBook(newBook);
+    if (borrowedBooks.length > 0) {
+      const ids = borrowedBooks.map((doc) => doc._id);
+      const listedBooks = await getBorrowedBooks({ _id: { $in: ids } });
+      console.log("All borrowed books: ", borrowedBooks);
 
-    if (book.length > 0) {
-      const ids = book.map(doc=> doc._id)
-      const listedBooks = await getBorrowedBooks({_id : { $in: ids }})
-      console.log("Populated book: ", listedBooks)
-      console.log("Inserted book: ", ids)
+      borrowedBooks.map(async (b) => {
+        await updateBook({
+          _id: b.book.toString(),
+          expectedAvailabilityDate: dueDate,
+        });
+      });
+
       return responseClient({
         req,
         res,
@@ -126,6 +133,7 @@ export const borrowMultipleNewBook = async (req, res, next) => {
       statusCode: 400,
     });
   } catch (error) {
+    console.log("Errors", error);
     next(error);
   }
 };
