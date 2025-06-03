@@ -1,10 +1,11 @@
 import { responseClient } from "../middlewares/responseClient.js";
-import { updateBook } from "../models/book/bookModel.js";
+import { updateBook, updateBook } from "../models/book/bookModel.js";
 import {
   borrowBook,
   borrowManyBook,
   getAllBorrowedBook,
   getBorrowedBooks,
+  updateBorrowedBook,
 } from "../models/borrow/borrowBookModel.js";
 
 const BOOK_DUE_DATE = 15;
@@ -136,4 +137,55 @@ export const borrowMultipleNewBook = async (req, res, next) => {
     console.log("Errors", error);
     next(error);
   }
+};
+
+export const returnBorrowedBook = async (req, res) => {
+  const user = req.userInfo;
+  const borrow = req.body;
+
+  //make expectedAvailabilityDate of book null
+
+  const filterBook = {
+    _id: borrow?.book?._id,
+  };
+
+  const bookObj = {
+    expectedAvailabilityDate: null,
+  };
+
+  //set returned date from borrow to current date
+  const filter = {
+    _id: borrow?._id,
+    userId: user._id,
+  };
+
+  const obj = {
+    isReturned: true,
+    returnedDate: Date.now(),
+  };
+
+  const result = await updateBorrowedBook({ filter, obj });
+  if (result?._id) {
+    const updateBook = await updateBook({ filterBook, bookObj });
+    if (updateBook?._id) {
+      return responseClient({
+        req,
+        res,
+        message: "Book returned successfully.",
+      });
+    }
+    return responseClient({
+      req,
+      res,
+      message: "Unable to update book. Please contact admin.",
+      statusCode: 500,
+    });
+  }
+  //
+  return responseClient({
+    req,
+    res,
+    message: "Unable to return book. Please contact administrator ASAP.",
+    statusCode: 500,
+  });
 };
