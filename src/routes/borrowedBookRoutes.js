@@ -9,6 +9,7 @@ import {
   borrowNewBook,
   getAllBorrowedBooks,
   getUserBorrowedBooks,
+  returnBorrowedBook,
 } from "../controllers/borrowBookController.js";
 import { validateBorrowedBook } from "../middlewares/validation/borrowBookValidation.js";
 
@@ -30,15 +31,11 @@ router.post(
   borrowMultipleNewBook
 );
 
-// router.put(
-//   "/:id",
-//   userAuthMiddleware,
-//   adminAuthMiddleware,
-//   upload.array("bookImage"),
-//   validateBookID,
-//   validateUpdateBook,
-//   updateExistingBook
-// );
+router.patch(
+  "/",
+  userAuthMiddleware,
+  returnBorrowedBook
+);
 
 // router.delete("/:id", userAuthMiddleware, adminAuthMiddleware, validateBookID, deleteExistingBook)
 
