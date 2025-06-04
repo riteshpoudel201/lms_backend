@@ -1,5 +1,5 @@
 import { responseClient } from "../middlewares/responseClient.js";
-import { updateBook, updateBook } from "../models/book/bookModel.js";
+import { updateBook } from "../models/book/bookModel.js";
 import {
   borrowBook,
   borrowManyBook,
@@ -143,6 +143,8 @@ export const returnBorrowedBook = async (req, res) => {
   const user = req.userInfo;
   const borrow = req.body;
 
+  console.log("Borrowed Book: ", borrow);
+
   //make expectedAvailabilityDate of book null
 
   const filterBook = {
@@ -166,8 +168,8 @@ export const returnBorrowedBook = async (req, res) => {
 
   const result = await updateBorrowedBook({ filter, obj });
   if (result?._id) {
-    const updateBook = await updateBook({ filterBook, bookObj });
-    if (updateBook?._id) {
+    const updatedBook = await updateBook({ filterBook, bookObj });
+    if (updatedBook?._id) {
       return responseClient({
         req,
         res,
