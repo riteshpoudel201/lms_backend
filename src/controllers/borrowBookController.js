@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { responseClient } from "../middlewares/responseClient.js";
 import { updateBook } from "../models/book/bookModel.js";
 import {
@@ -143,6 +144,19 @@ export const returnBorrowedBook = async (req, res) => {
   const user = req.userInfo;
   const borrow = req.body;
 
+  console.log("User with authority: ", user);
+  console.log("User for update: ", borrow.userId);
+  if (!borrow || !borrow._id) {
+    throw new Error("Missing borrow or borrow._id");
+  }
+  if (user._id.toString() !== borrow.userId) {
+    return responseClient({
+      req,
+      res,
+      message: "Unable to update book. User unauthorized.",
+      statusCode: 403,
+    });
+  }
   console.log("Borrowed Book: ", borrow);
 
   //make expectedAvailabilityDate of book null
@@ -156,38 +170,44 @@ export const returnBorrowedBook = async (req, res) => {
   };
 
   //set returned date from borrow to current date
-  const filter = {
+  const borrowFilter = {
     _id: borrow?._id,
-    userId: user._id,
+    userId: user?._id,
   };
 
-  const obj = {
+  const borrowObj = {
     isReturned: true,
     returnedDate: Date.now(),
   };
+  try {
+    const result = await updateBorrowedBook(borrowFilter, borrowObj);
+    console.log("Update Borrow Result: ", result);
+    if (result?._id) {
+      const updatedBook = await updateBook(filterBook, bookObj);
 
-  const result = await updateBorrowedBook({ filter, obj });
-  if (result?._id) {
-    const updatedBook = await updateBook({ filterBook, bookObj });
-    if (updatedBook?._id) {
+      console.log("Update Book Result: ", updatedBook);
+      if (updatedBook?.acknowledged) {
+        return responseClient({
+          req,
+          res,
+          message: "Book returned successfully.",
+        });
+      }
       return responseClient({
         req,
         res,
-        message: "Book returned successfully.",
+        message: "Unable to update book. Please contact admin.",
+        statusCode: 500,
       });
     }
+  } catch (error) {
     return responseClient({
       req,
       res,
-      message: "Unable to update book. Please contact admin.",
+      message: "Unable to return book. Please contact administrator ASAP.",
       statusCode: 500,
     });
   }
+
   //
-  return responseClient({
-    req,
-    res,
-    message: "Unable to return book. Please contact administrator ASAP.",
-    statusCode: 500,
-  });
 };

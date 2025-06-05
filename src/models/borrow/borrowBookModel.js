@@ -26,7 +26,7 @@ export const emptyBorrowBook = () => {
  }
 
  export const updateBorrowedBook =(filter, updates) =>{
-    return  BookModel.findOneAndUpdate({filter, updates});
+    return  BookModel.findOneAndUpdate(filter, {$set: updates},{new: true});
  }
 
  export const deleteOneBorrowedBook =(filter) =>{
